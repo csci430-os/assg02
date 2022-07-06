@@ -67,13 +67,15 @@ do
     numtests=$(( numtests + 1 ))
 done
 
-# report results over all of the tests
+# report results over all of the tests, set explicit exit code to indicate success/failure
 if [ ${passed} -eq ${numtests} ]
 then
     echo -e "${GREEN}===============================================================================${NORMAL}"
     echo -e "${GREEN}All system tests passed    ${NORMAL} (${passed} tests passed of ${numtests} system tests)"
+    exit 0
 else
     echo -e "${RED}===============================================================================${NORMAL}"
     echo -e "${RED}System test failures detected${NORMAL} (${passed} tests passed of ${numtests} system tests)"
+    exit 1
 fi
 
