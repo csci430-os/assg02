@@ -3,7 +3,7 @@ title: 'Assignment 02: Process State Simulation'
 author: 'CSci 430: Introduction to Operating Systems'
 ---
 
-# Overview
+# Objectives
 
 In this assignment we will simulate a three-state process model
 (ready, running and blocked) and a simple process control block
@@ -32,7 +32,7 @@ and unblocked because of (simulated) I/O events.
 - Practice using STL queues and list data structures.
 
 
-# Introduction
+# Description
 
 In this assignment you will simulate a three-state process model
 (ready, running and blocked) and a simple list of processes, like the
@@ -127,7 +127,32 @@ But you will need to write methods for the `ProcessSimulator` and define your
 process list, ready queue, and other structures to keep track of blocked
 processes and the events they are waiting on.
 
-# Unit Test Tasks
+# Overview and Setup
+
+For this assignment you will be implementing missing member methods
+of the `ProcessSimulator.[hpp|cpp]` class.  As usual
+before starting the assignment tasks proper, you should make
+sure that you have completed the following setup steps:
+
+1. Accept the assignment and copy the assignment repository on GitHub
+   using the provided assignment invitation link for 'Assignment 02
+   Process Simulator' for our current class semester and
+   section.
+2. Clone the repository using the SSH URL to your host file system
+   in VSCode.  Open up this folder in a Development Container to access
+   and use the build system and development tools.
+4. Confirm that the project builds and runs, though no tests will be
+   defined or run initially.  If the project does not build on the first
+   checkout, please inform the instructor.  Confirm that you C++
+   Intellisense extension is working, and that your code is being
+   formatted according to class style standards when files are saved.
+5. You should create the issue for Task 1 and/or for all tasks for the assignment
+   now before beginning the first task.  On your GitHub account, go to issues,
+   and create it/them from the issue templates for the assignment.  Also make
+   sure you are linking each issue you create with the `Feedback`
+   pull request for the assignment.
+
+# Assignment Tasks
 
 There are 3 classes given to you for this assignment, defined in the
 `ProcessState.[cpp|hpp]`, `Process.[cpp|hpp]`, and
@@ -179,7 +204,10 @@ to pass, and I strongly suggest you work on implementing the functions
 and passing the tests in this order.  You will need to perform the
 following tasks.
 
-1. You should start by getting the initial getter function tests to work in the
+
+## Task 1: Implement `ProcessSimulator` Constructor and Accessor Methods
+
+You should start by getting the initial getter function tests to work in the
 second test case.  We did not give you the implementation of the constructor for
 the `ProcessSimulator` class, so you will need to start with a constructor that
 specifies the system time slice quantum and saves that value.  The other
@@ -196,7 +224,10 @@ methods are used for debugging the unit tests, so that we can query different
 properties of the current state of your simulation and see if they return the
 expected value or not.
 
-2. Implement the `newEvent()` function.  The `newEvent()` function is called
+
+## Task 2: Implement the `newEvent()` member method
+
+Implement the `newEvent()` function.  The `newEvent()` function is called
 whenever a "new"  occurs in the simulation.  Basically you need to create a new
 process, assign it the correct next process id, make the process ready, and add
 it to the end of your ready queue. I would suggest again you work on
@@ -208,7 +239,10 @@ next process id that will be assigned and returns it in this function. You will
 want to use the constructor for the `Process` and the `ready()` member function
 of the `Process` in your implementation of `newEvent()`.
 
-3. Implement the `dispatch()` function.  There are two actions that don't
+
+## Task 3: Implement the 'dispatch()` member method
+
+Implement the `dispatch()` function.  There are two actions that don't
 directly correspond to explicit events in our simulation.  Later on when we get
 to implementing the whole simulation, the `dispatch()` should basically occur
 before you process the next explicit event of the simulation (and the
@@ -220,14 +254,18 @@ need to define some mechanism by which you keep track of whether or not the CPU
 is currently idle or is currently running a process, and if it is running
 a process you need to know which process is currently running on the CPU.
 
-4. Implement basic `cpuEvent()` CPU cycles.  The `cpuEvent()` is relatively
+## Task 4: Implement the `cpuEvent()` member method
+
+Implement basic `cpuEvent()` CPU cycles.  The `cpuEvent()` is relatively
 simple.  The system time should be incremented by 1 every time a CPU event
 occurs.  Also, if a process is currently running on the CPU, its `timeUsed`
 should be incremented by 1 and its `quantumUsed` as well.  You should use the
 `cpuCycle()` member function of the `Process` class to do the work needed to
 increment the time used and quantum used of the current running process.
 
-5. Implement the `timeout()` function.  This is the other implicit action needed
+## Task 5: Implement the `timeout()` member method
+
+Implement the `timeout()` function.  This is the other implicit action needed
 for your simulation.  The basic thing that `timeout()` should do is to test if
 the quantumUsed of the current running process is equal to or has exceeded the
 system time slice quantum.  If it has, then the process needs to be timed out,
@@ -242,7 +280,9 @@ you implemented these 3 functions well, these tests will be passing as
 well from your implementations of `dispatch()`, `cpuEvent()` and
 `timeout()`.
 
-6. Implement the `blockEvent()` simulation function.  Besides the round robin
+## Task 6: Implement the `blockEvent()` member method
+
+Implement the `blockEvent()` simulation function.  Besides the round robin
 scheduling of processes, your simulation will also simulate blocking and
 unblocking on simulated I/O or other types of events. An event in our simulation
 is simple, we just abstractly say that some event of a given unique `eventId`
@@ -257,7 +297,10 @@ into a BLOCKED state, and should record the `eventId` that the process
 is now waiting on.  You should use the `block()` `Process` member
 function in your implementation of `blockEvent()`.
 
-7. Implement the `unblockEvent()` simulation function.  You would not need this
+
+## Task 7: Implement the `unblockEvent()` member method
+
+Implement the `unblockEvent()` simulation function.  You would not need this
 for the previous unit test, but now you need to have some way to find out which
 process is blocked waiting on a particular `eventId` to occur.  You could just
 do a simple search of your process list to find the blocked process waiting on
@@ -270,7 +313,9 @@ once you identify the process that should be unblocked, you should use the
 function.  You will also need to put the blocked process back onto the tail of
 the ready queue when it unblocks.
 
-8. Implement the `doneEvent()` simulation function.  This function simulates a
+## Task 8: Implement the `doneEvent()` member method
+
+Implement the `doneEvent()` simulation function.  This function simulates a
 process finishing and exiting the system.  There is no `done()` function in the
 `Process` class, though you could add one if you think you need it.  But for a
 done event, you can simply remove the process from the list of active processes
@@ -279,9 +324,10 @@ done event, you can simply remove the process from the list of active processes
 
 # System Tests: Putting it all Together
 
-Once all of the unit tests are passing, you can begin working on the system tests.  Once the unit tests are all passing, your simulation is actually working
-correctly.  But to test a full system simulation we have to add some output
-to the running simulator.
+Once all of the unit tests are passing, you can begin working on the
+system tests.  Once the unit tests are all passing, your simulation is
+actually working correctly.  But to test a full system simulation we
+have to add some output to the running simulator.
 
 I will give up to 5 bonus points for correctly adding the output and getting all
 of the system tests to pass as well for this assignment. For the
@@ -423,7 +469,7 @@ System test process-events-03 quantum 15: PASSED
 System test process-events-04 quantum 05: PASSED
 System test process-events-04 quantum 11: PASSED
 ===============================================================================
-System test failures detected (5 tests passed of 10 system tests)
+System tests succeeded (10 tests passed of 10 system tests)
 ```
 
 The most common reason that some of the system tests will pass but some fail is
@@ -441,32 +487,35 @@ not bonus points for this part.
 
 # Assignment Submission
 
-In order to document your work and have a definitive version you would like
-to grade, a MyLeoOnline submission folder has been created named Assignment-02
-for this assignment.  There is a target in your `Makefile` for these assignments
-named `submit`.  When your code is at a point that you think it is ready to submit,
-run the submit target:
+For this class, the submission process is to correctly create pull
+request(s) with changes committed and pushed to your copied repository
+for grading and evaluation.  For the assignments, you may not be able
+to complete all tasks and have all of the tests successfully
+finishing.  This is ok.  However, you should endeavor to have as many
+of the tasks completed before the deadline for the assignment as
+possible.  Also, try and make sure that you only push commits that are
+building and able to run the tests.  You may loose points for pushing
+a broken build, especially if the last build you submit is not
+properly compiling and running the tests.
 
-```
-$ make submit
-tar cvfz assg02.tar.gz ProcessSimulator.hpp ProcessSimulator.cpp
-  Process.hpp Process.cpp ProcessState.hpp ProcessState.cpp
-ProcessSimulator.hpp
-ProcessSimulator.cpp
-Process.hpp
-Process.cpp
-ProcessState.hpp
-ProcessState.cpp
-```
 
-The result of this target is a tared and gziped (compressed) archive,
-named `assg02.tar.gz` for this assignment.  You should upload
-this file archive to the submission folder to complete this
-assignment.  I will probably be also directly logging into your
-development server, to check out your work.  But the submission of the
-files serves as documentation of your work, and as a checkpoint in
-case you keep making changes that might break something from when you
-had it working initially.
+In this problem, up to 50 points will be given for having at least 1
+commit that compiles and runs the tests (and at least some attempt was
+made to work on the first task).  Thereafter 5 to 10 points are awarded for
+completing each of the remaining 6tasks.  However you should note that the
+autograder awards either all point for passing all tests, or no points
+if any test is failing for one of the tasks.  Also note that even if
+you pass all tests, when the instructor evaluates your assignment,
+they may remove points if you don't follow the requirements for
+implementing the code (e.g. must reuse functions here as described,
+need to correctly declare parameters or member functions as `const`
+where needed, must have function documentation correct).  You may also
+loose points for style issues.  The instructor may give back comments
+in pull requests and/or create new issues for you if you have issues
+such as these, so it is good to have work committed early before the
+due date, so that the instructor may give feedback requesting you to
+fix issues with your current submission.
+
 
 # Requirements and Grading Rubrics
 
@@ -474,26 +523,23 @@ had it working initially.
 
 1. Your program must compile, run and produce some sort of output to be
    graded.  0 if not satisfied.
-2. 12.5 pts each (100 pts) for completing each of the 8 listed steps in this
-   assignment to write the functions needed to create the `ProcessSimulator`.
-3. +10 bonus pts if all system tests pass and your process simulator produces
+2. 40 points for keeping code that compiles and runs.  A minimum of 50 points
+   will be given if at least the first task is completed and passing tests.
+3. 5 to 10 points are awareded for completing each subsequent task 2-8.
+4. +5 bonus pts if all system tests pass and your process simulator produces
    correct output for the given system tests.
 
 ## Program Style and Documentation
 
-This section is supplemental for the second assignment.  If you use
-the VS Code editor as described for this class, part of the configuration is to
-automatically run the `uncrustify` code beautifier on your code files everytime
-you save the file.  You can run this tool manually from the command line
-as follows:
+This section is supplemental for the first assignment.  If you uses
+the VS Code editor as described for this class, part of the
+configuration is to automatically run the `clang-format` code style
+checker/formatter on your code files every time you save the file.  You
+can run this tool manually from the command line as follows:
 
 ```
-$ make beautify
-uncrustify -c ../../config/.uncrustify.cfg --replace --no-backup *.hpp *.cpp
-Parsing: HypotheticalMachineSimulator.hpp as language CPP
-Parsing: HypotheticalMachineSimulator.cpp as language CPP
-Parsing: assg01-sim.cpp as language CPP
-Parsing: assg01-tests.cpp as language CPP
+$ make format
+clang-format -i include/*.hpp src/*.cpp
 ```
 
 Class style guidelines have been defined for this class.  The `uncrustify.cfg`
@@ -545,13 +591,10 @@ documentation from your code.  You can build the documentation using the
 tools installed on your system to work.
 
 ```
-$ make docs
-doxygen ../../config/Doxyfile 2>&1
-  | grep warning
-  | grep -v "\file statement"
-  | grep -v "\pagebreak"
-  | sort -t: -k2 -n
-  | sed -e "s|/home/dash/repos/csci430-os-sims/assg/assg01/||g"
+$ make refdocs
+Generating doxygen documentation...
+doxygen config/Doxyfile 2>&1 | grep -A 1 warning | egrep -v "assg.*\.md" | grep -v "Found unknown command" | grep -v "Searching for include" | sed -e "s|/home/dash/repos/assg01/||g"
+Doxygen version used: 1.9.1
 ```
 
 The result of this is two new subdirectories in your current directory named
@@ -559,19 +602,14 @@ The result of this is two new subdirectories in your current directory named
 documentation in the `html` directory.  You will need `latex` tools installed
 to build the `pdf` reference manual in the `latex` directory.
 
-You can use the `make docs` to see if you are missing any required
+You can use the `make refdocs` to see if you are missing any required
 function documentation or tags in your documentation.  For example, if you
 remove one of the `@param` tags from the above function documentation, and
 run the docs, you would see
 
 ```
-$ make docs
-doxygen ../../config/Doxyfile 2>&1
-  | grep warning
-  | grep -v "\file statement"
-  | grep -v "\pagebreak"
-  | sort -t: -k2 -n
-  | sed -e "s|/home/dash/repos/csci430-os-sims/assg/assg01/||g"
+$ make refdocs
+doxygen config/Doxyfile 2>&1 | grep -A 1 warning | egrep -v "assg.*\.md" | grep -v "Found unknown command" | grep -v "Searching for include" | sed -e "s|/home/dash/repos/assg01/||g"
 
 HypotheticalMachineSimulator.hpp:88: warning: The following parameter of
 HypotheticalMachineSimulator::initializeMemory(int memoryBaseAddress,
@@ -579,6 +617,7 @@ HypotheticalMachineSimulator::initializeMemory(int memoryBaseAddress,
   parameter 'memoryBoundsAddress'
 
 ```
+
 The documentation generator expects that there is a description, and that
 all input parameters and return values are documented for all functions,
 among other things.  You can run the documentation generation to see if you
