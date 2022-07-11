@@ -17,5 +17,5 @@ process finishing and exiting the system.
 
 **Additional Requirements**
 
-
+- You are required to remove the event from the `processControlBlock` map when it is done.
 

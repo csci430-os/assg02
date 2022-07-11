@@ -19,4 +19,4 @@ process is blocked waiting on a particular `eventId` to occur.
 **Additional Requirements**
 
 
-
+- You are requied to throw a `SimulatorException` if an unblock occurs for an event but no process is currently waiting on that event to occur.

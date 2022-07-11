@@ -207,119 +207,415 @@ following tasks.
 
 ## Task 1: Implement `ProcessSimulator` Constructor and Accessor Methods
 
-You should start by getting the initial getter function tests to work in the
-second test case.  We did not give you the implementation of the constructor for
-the `ProcessSimulator` class, so you will need to start with a constructor that
-specifies the system time slice quantum and saves that value.  The other
-functions that are tested in this first unit test are things like
-`getNextProcessId()`, `getNumActiveProcesses()`, `readyQueueSize()`,
-`blockedListSize()`, etc.  You will need to initialize  member variables in
-the constructor, like the `timeSliceQuantum`, `systemTime`, `nextProcessId`,
-etc., and modify some or all of  these getter methods to return
-the member variable value.  I would suggest that you start by simply hard coding
-the expected initial values you need to return from these functions and just get
-these tests to pass.  Then later on as you are forced to implement more, you
-will add in the actual code you will need in these methods.  Most of these
-methods are used for debugging the unit tests, so that we can query different
-properties of the current state of your simulation and see if they return the
-expected value or not.
+### Task 1.1 Implement Constructor and Getter Methods
 
+As usual for these assignments, start by defining the task1
+test in the `assg02-tests.cpp` unit test file.
+
+You should start task 1 by getting the initial getter function tests
+to work in the test case for task 1 (second test case in the test
+file).  We did not give you the implementation of the constructor for
+the `ProcessSimulator` class, so you will need to start with a
+constructor that specifies the system time slice quantum and saves
+that value.  Many of the other member variables besides the
+`timeSliceQuantum` need to be initialized to default variables then in
+the constructor.  The tests for task 1 show what the expected default
+starting values should be for many of the member variables.
+
+You should be able to pass the first test for task 1, once you
+initialize things properly in the constructor, by implementing the
+`getTimeSliceQuantum()` member function.
+
+Once you have the test for the time slice quantum working, initialize
+the next process id and the system time to 1 in the constructor.
+Then implement `getNextProcessId()` and `getSystemTime()` getter
+methods.
+
+### Task 1.2 Process Control Block accessors
+
+We will be using an stl `map` for our process control block.  In the
+`ProcessSimulator.hpp` private member variables, you will find
+this member variable declaration:
+
+```
+map<Pid, Process> processControlBlock;
+```
+
+An stl `map` is a data structure that maps keys to values.  Maps are
+also known as dictionaries and hashes in other programming languages.
+Here we use the process identifier `Pid` as the key, to be able to look
+up and access the `Process` object that has that identifier.  In practical
+terms, you can use this map as an array.  For example, if you want to
+access the process with an identifier of 1, and send it a message
+to make itself ready, you could do this (assuming the process is in
+the map):
+
+```
+Pid pid = 1;
+processControlBlock[pid].ready();
+```
+
+The `processControlBlock` is an stl data structure.  You should look up the
+documentation of what methods you can use on a `map`. Implement
+a method next called `getNumActiveProcesses()`.  The `size` of the
+`processControlBlock` will correspond to the number of processes currently
+being managed in the table.  Thus you simply need to return the
+current `processControlBlock`'s size to determine the number of active
+processes in the system.
+
+Also, when a process is finished in our simulation, we will remove it from
+the `processControlBlock`.  But we won't keep a corresponding map of
+finished processes, we will simply keep track of the number of processes
+that have finished so far.  So you should initialize the
+member variable named `numFinishedProcesses` to 0 in the constructor, then
+create a method called `getNumFinishedProcesses()` that returns this
+member variable when we need to query the simulation to find out the
+number of processes that have completed so far.
+
+### Task 1.3: Ready Queue member methods
+
+Also in the `ProcessSimulator` header file, you will find a
+declaration of the member variable we will use for this
+simulations ready queue:
+
+```
+list<Pid> readyQueue
+```
+
+We will be using an stl `list` as a queue, even though there is an actual
+`queue` type defined in the stl.  We can treat a `list` like a queue by
+pushing new or timed out processes to the back of the list, and dequeuing
+processes at the front of the list when we need to dispatch a new process.
+We use a `list` to make it easier later on to iterate over all of the
+processes currently on the ready queue, which you cannot do with an
+stl `queue` data structure.
+
+Create a method named `readyQueueSize()`.  This simply reports the number of
+processes currently on the ready queue.  Query the `readyQueue` to determine
+and return its `size` from this method.
+
+Then in addition, you need to implement two member methods that will return
+the `Pid` of the process currently at the front and the back of the queue
+respectively.  A normal stl `list` is a bit unsafe, if you ask for the
+front item from an empty list, your program will crash.  It does not
+error check for you that you are trying to remove an item from an empty
+list.
+
+So first implement the `readyQueueFront()` member method.  This method should
+return the `Pid` of the process at the front of the list.  But first check to
+see if the list is empty, and if it is, return `IDLE` instead of having
+your program crash.
+
+Likewise, also implement a `readyQueueBack()` member method that will return
+`IDLE` if the queue is empty, but will return the current back item of the
+queue if there are 1 or more process identifiers currently in the queue.
+
+Once you have implemented those member methods, you should be able to pass all
+of the tests for task 1, including the final test that checks if the simulation
+is in a particular state.  The `isInState()` member method is really just a
+convenience method used by the tests for this assignment, it allows us to test
+that the state of the simulation is exactly what is expected in 1 function call.
+
+You might want to consider making separate commits for each of the subtasks
+listed above.  But in any case, you need to make at least 1 commit, if not more,
+of your working accessor and information methods, and push them to GitHub
+before continuing to task 2.  Once you are satisfied your code compiles and
+runs and passes the tests for task 1, then continue on to task 2.
 
 ## Task 2: Implement the `newEvent()` member method
 
+
+### Task 2.1: Implement `newEvent()` member method
+
 Implement the `newEvent()` function.  The `newEvent()` function is called
-whenever a "new"  occurs in the simulation.  Basically you need to create a new
-process, assign it the correct next process id, make the process ready, and add
-it to the end of your ready queue. I would suggest again you work on
-implementing code to get the unit tests to pass in the order given in
-the third unit test.  For example,
-just get the check of the `sim.getNextProcessId()` == 2 to work first by
-defining a member variable in your `ProcessSimulator` that keeps track of the
-next process id that will be assigned and returns it in this function. You will
-want to use the constructor for the `Process` and the `ready()` member function
-of the `Process` in your implementation of `newEvent()`.
+whenever a "new"  occurs in the simulation.  You will be creating a new
+process, assigning it the next process id (and incrementing the process id
+in preparation for the next new process to arrive).  And you need
+to put the process into the `processControlBlock` once you have created it
+and configured the new process correctly.  The `newEvent()` member
+function does not have any input parameters, and it doesn't return
+anything (it is a `void` function).  All of its work is done by
+update the state of the simulation to create and add a new process
+into the system.
+
+
+### Task 2.2: Implement the `getProcess()` accessor
+
+You will also implement the `getProcess()` member function after you get your
+basic `newEvent()` working.  The `getProcess()` function is used mainly
+for testing, its purpose is to access the `processControlBlock` and return
+the `Process` that has a particular process identifier (`Pid`).  You will
+need to look up the `Process` in your `processControlBlock` to implement
+this function.
+
+The `getProcess()` member function should return a reference to the
+`Process` object asked for.  So the signature of the member function should
+look like this:
+
+```
+Process& getProcess(Pid pid);
+```
+
+Notice that we are returning a reference to a `Process` instance here, which may
+be used to actually modify the information directoy in the returned process.
+
+
+## Task 2.3: Put new processes in Ready state
+
+Finally you will also putting the new process into an initial `READY`
+state, and putting the process onto the end of the ready queue.  All new
+processes are immediately made ready in this simulation and added to the ready queue.
+The tests for task 2 check this by looking at the size of your queue and
+the processes at the front and back of the queue, so your queue methods from
+the previous task need to be working here for the tests of you putting
+new processes on the ready queue correctly.
+
+You should make 1 or more commits of your work in completing task 2.  Once
+your code is compiling and passing the task 2 tests, and you are satisfied
+with the work, you can then proceed to task 3.
 
 
 ## Task 3: Implement the 'dispatch()` member method
 
-Implement the `dispatch()` function.  There are two actions that don't
-directly correspond to explicit events in our simulation.  Later on when we get
-to implementing the whole simulation, the `dispatch()` should basically occur
-before you process the next explicit event of the simulation (and the
-`timeout()` will always occur after you process each explicit event).  The first
-unit test of `dispatch()` are where you may need to implement a real ready queue
-(you could probably fake it or ignore it through the previous unit tests).
-Before you work on defining a queue structure for your ready queue, you will
-need to define some mechanism by which you keep track of whether or not the CPU
-is currently idle or is currently running a process, and if it is running
-a process you need to know which process is currently running on the CPU.
+
+In this task we ultimatly want to implement the `dispatch()` function
+of this simulation.  But before we do that, we need some way of keeping
+track which process, if any, is currently running on the cpu.
+
+
+### Task 3.1: Keep track of the running process
+
+There is a member variable called `cpu` of the `ProcessSimulator` class.
+The `cpu` member variable will have the `Pid` of the process that is currently
+running on the system, or it will be assigned the special `Pid` of `IDLE`
+whenever the system has no process running on the cpu.
+
+You need to ensure that the `cpu` member variable is initialized to a value
+of `IDLE` in the class constructors.  In addition, you will add two more
+simple accessor methods here, that will be useful to implement the
+`dispatch()` function.
+
+After initialized the `cpu` to `IDLE`, add in a member function called
+`isCpuIdle()`.  This will be a function that doesn't have any
+parameters, but returns a `bool` result.  It should return `true` if
+the cpu is `IDLE`, and `false` when the cpu is not idle.  This member
+function should be a `const` member function, since the state of the
+system is not modified when this function is called.
+
+Also create and add a member method called `runningProcess()`.  Again this
+method doesn't have any input parameters.  But this method returns a `Pid`,
+and to implement it, you can simply return the value of the `cpu` member
+variable.  Again this member function should be a `const` member function.
+
+### Task 3.2: Implement `dispatch()`
+
+Next implement the `dispatch()` function.  The `dispatch()` function has
+no parameters for input and it is a `void` function that returns no result.
+
+The basic pseudocode of what the `dispatch()` should do is as follows:
+
+```
+// first check if something is currently running, we only dispatch
+// something new when cpu is not currently running anything
+if cpu is not idle:
+   do nothing
+
+// otherwise cpu is idle, so try and dispatch a process, but if
+// ready queue is empty, we still can't dispatch the next process
+if ready queue is empty:
+   do nothing
+   
+// otherwise cpu is idle and there is one or more process ready to run,
+// so get the process at front of queue and make it the running process
+pid = ready queue front process
+cpu = pid
+look up process in the processControlBlock and put it in the running state
+```
+
+Once you are satisfied with your work, and have pushed one or more commits
+to GitHub of your task 3 work, you may then move on to the next task.
 
 ## Task 4: Implement the `cpuEvent()` member method
 
-Implement basic `cpuEvent()` CPU cycles.  The `cpuEvent()` is relatively
-simple.  The system time should be incremented by 1 every time a CPU event
-occurs.  Also, if a process is currently running on the CPU, its `timeUsed`
-should be incremented by 1 and its `quantumUsed` as well.  You should use the
-`cpuCycle()` member function of the `Process` class to do the work needed to
-increment the time used and quantum used of the current running process.
+Implement basic `cpuEvent()` to simulate the cpu running cycles.  The
+`cpuEvent()` is relatively simple.  As with most of the even simulation
+methods, it is a `void` function that takes no parameters as input.
+
+We simulate work being done by incrementing the system time, and also
+keeping track of how many time slices each process has run in its
+current time slice quantum.  The system time should be incremented by
+1 every time a CPU event occurs.  Also, if a process is currently
+running on the CPU, its `timeUsed` should be incremented by 1 and its
+`quantumUsed` as well.  You should use the `cpuCycle()` member
+function of the `Process` class to do the work needed to increment the
+time used and quantum used of the current running process.
+
+So the pseudocode for the `cpuEvent()` function is:
+
+```
+// increment the system time
+systemTime++
+
+// if the cpu is running a process, call the cpuCycle member funciton of the
+// process to update its time used and quantum used
+if cpu is not idle
+  access the process from the processControlBlock
+  call the cpuEvent() method on the process that is currently running
+```
+
+Once you are satisfied with your work, push your commits to GitHub and
+continue on to the next task.
+
 
 ## Task 5: Implement the `timeout()` member method
 
-Implement the `timeout()` function.  This is the other implicit action needed
-for your simulation.  The basic thing that `timeout()` should do is to test if
-the quantumUsed of the current running process is equal to or has exceeded the
-system time slice quantum.  If it has, then the process needs to be timed out,
-which means it goes back to a ready state and is returned back to the tail of
-the ready queue.  You should use the `isQuantumExceeded()` and `timeout()`
-member functions from the `Process` class in your implementation of the
-simulation `timeout()` member function.
+Implement the `timeout()` function to check if the current running
+process has exceeded running its time slice quantum.  As with your
+previous simulation event functions, the `timeout()` is a `void`
+function, that does not take any parameters as input.
 
-There is a test case after the `timeout()` test case that does some
-more extensive testing of a dispatch/cpu/timeout cycle. Hopefully if
-you implemented these 3 functions well, these tests will be passing as
-well from your implementations of `dispatch()`, `cpuEvent()` and
-`timeout()`.
+The basic thing that `timeout()` should do is to test if the
+quantumUsed of the current running process is equal to or has exceeded
+the system time slice quantum.  If it has, then the process needs to
+be timed out, which means it goes back to a ready state and is
+returned back to the tail of the ready queue.  You should use the
+`isQuantumExceeded()` and `timeout()` member functions from the
+`Process` class in your implementation of the simulation `timeout()`
+member function.
+
+The pseudocode for the `timeout()` function is:
+
+```
+// if cpu is idle, no process to check currently
+if cpu is idle
+    return
+	
+// otherwise check the current running process
+look up running process in the processControlBlock
+if process time slice quantum is exceeded:
+   timeout the process
+   put the process on the back of the ready queue
+   set the cpu to IDLE
+```
+
+Once you are satisfied with your work, push your commits to GitHub and
+continue on to the next task.
 
 ## Task 6: Implement the `blockEvent()` member method
 
-Implement the `blockEvent()` simulation function.  Besides the round robin
-scheduling of processes, your simulation will also simulate blocking and
-unblocking on simulated I/O or other types of events. An event in our simulation
-is simple, we just abstractly say that some event of a given unique `eventId`
-will occur, and that processes block until this `eventId` occurs, when they
-become unblocked. In your simulation, we simplify things and say that only 1
-process can ever be waiting on any particular `eventId`.  In some real systems
-it is possible for 1 event to cause multiple processes to become unblocked, but
-we will not implement that idea here.
+Implement the `blockEvent()` simulation function.  
+Besides the round robin scheduling of processes, your simulation will
+also simulate blocking and unblocking on simulated I/O or other types
+of events. An event in our simulation is simple, we just abstractly
+say that some event of a given unique `eventId` will occur, and that
+processes block until this `eventId` occurs, when they become
+unblocked.
+
+The `blockEvent()` function is a `void` function as before, but
+`blockEvent()` does take a parameter.  It takes an `EventId`
+parameter, which is simply a `typedef` for an `int`.  This parameter
+is the identifier of the event that the current running process is
+being blocked upon.
+
+In your simulation, we simplify things and say that only 1
+process can ever be waiting on any particular `eventId`.  In some real
+systems it is possible for 1 event to cause multiple processes to
+become unblocked, but we will not implement that idea here.
 
 The `blockEvent()` function should put the current running process
 into a BLOCKED state, and should record the `eventId` that the process
-is now waiting on.  You should use the `block()` `Process` member
-function in your implementation of `blockEvent()`.
+is now waiting on.  In our simulation it doesn't make sense for a
+block event to occur when the cpu is `IDLE`.  So the first thing you
+need to do is check if the cpu is `IDLE` and if it is you should
+throw the expected `SimulatorException`.
+
+You should use the `block()` `Process` member function in your
+implementation of `blockEvent()`.
+
+Also, you need to add the mapping into the `blockedList` of the
+`EventId` to the `Pid`, so that you can look up the process that needs
+to be unblocked in the next step.  However, we also consider it
+an error in this simulation to have more than 1 process blocked
+on a given event.  So if there is already a process waiting on
+the event that just occurred, you should throw an exception.
+**HINT**: The `count()` member method of the stl `map` is probably
+the easiest way to check for this.
+
+And finally, since the current running process just blocked, don't
+forget to set the cpu to the `IDLE` state.
+
+The pseudo code for the `blockEvent()` is then:
+
+```
+# test for errors first, should be an error if cpu is IDLE when a
+# block occurs
+if cpu is IDLE
+   throw SimulatorException
+   
+
+# it is also an error if there is already a process waiting on
+# the event that just happened
+if blockedList already has a process waiting on this event
+   throw SimulatorException
+   
+# otherwise there is a process running and we can block it on
+# the indicated event
+Look up the current running process in the processControlBlock and block it
+Enter the mapping between the event and this process in the blockedList
+Set the cpu to IDLE
+```
+
+Once you are satisfied with your work, push your commits to GitHub and
+continue on to the next task.
 
 
 ## Task 7: Implement the `unblockEvent()` member method
 
-Implement the `unblockEvent()` simulation function.  You would not need this
-for the previous unit test, but now you need to have some way to find out which
-process is blocked waiting on a particular `eventId` to occur.  You could just
-do a simple search of your process list to find the blocked process waiting on
-the particular `eventId`.  In the example solution I will post after this
-assignment, I used an STL map, to map from an `eventId` to a process id, and
-thus be able to directly query the map to find which process should be unblocked
-when an `eventId` occurs.  However you implement keeping track of the mapping,
-once you identify the process that should be unblocked, you should use the
-`unblock()` member function of the `Process` class in your `unblockEvent()`
-function.  You will also need to put the blocked process back onto the tail of
-the ready queue when it unblocks.
+Implement the `unblockEvent()` simulation function.  This function
+will try and unblock the process that is waiting on the event that
+just occurred.  So again, like the previous block function, the
+`unblockEvent()` is a void function, but it takes an `eventId` as
+an input parameter.
+
+Unblocks can happen when the cpu is idle, so that is not an error
+condition here.  But again we consier it an error if an unblock
+occurs for an event aht doesn't have any process currently waiting on it.
+So again check the `blockedList` first but this time if there is no
+process waiting on the event, throw an exception.
+
+Otherwise you need to look up the process in the process control block
+and call `unblock()` on it to unblock the process and make it ready
+again.  But then you also need to put the process back onto the
+tail of the ready queue.  Finally, since there is nothing waiting on this
+event anymore, you need to remove the mapping from the `blockedList` between
+this event and the process. **HINT**: there isn't a real simple way to 
+remove a key/value pair from a C++ stl map.  You need to use the `find()`
+member method to get an iterator pointing to the item in the map, then
+call `erase()` to erase it.  Read the `erase()` documentation on cplusplus.com
+for an example of doing this.
+
+Once you are satisfied with your work, push your commits to GitHub and
+continue on to the next task.
 
 ## Task 8: Implement the `doneEvent()` member method
 
 Implement the `doneEvent()` simulation function.  This function simulates a
 process finishing and exiting the system.  There is no `done()` function in the
-`Process` class, though you could add one if you think you need it.  But for a
-done event, you can simply remove the process from the list of active processes
-(for example take it out of your process list).
+`Process` class, though you could add one if you think you need it. 
+
+It is considered an error in the simulation for a done event to occur if
+the cpu is IDLE.  So first check for this error case.
+
+
+Then for a done event, you should remove the process from the
+`processControlBlock` map (same way you removed the event/process pair
+from the `blockedList`.  Also don't forget to set the cpu back to the
+IDLE state, because the current running process just finished, and
+also increment the member variable keeping track of the number of
+finished processes.
+
+Once you are satisfied with your work, push your commits to GitHub and
+continue on to the next task.
 
 
 # System Tests: Putting it all Together
@@ -327,7 +623,8 @@ done event, you can simply remove the process from the list of active processes
 Once all of the unit tests are passing, you can begin working on the
 system tests.  Once the unit tests are all passing, your simulation is
 actually working correctly.  But to test a full system simulation we
-have to add some output to the running simulator.
+have to finish the `runSimulation()` method, and also finish the
+`toString()` method and add some output when running the simulation..
 
 I will give up to 5 bonus points for correctly adding the output and getting all
 of the system tests to pass as well for this assignment. For the
@@ -448,7 +745,7 @@ else
 You would need to add something like this so that the process that is on the
 CPU is correctly displayed in the simulation output.  Likewise you need to do
 similar things to display the processes on the ready queue and the blocked list,
-though of course you will need loops to go through and output/dispaly all such processes in either of these states in the appropriate output location.
+though of course you will need loops to go through and output/display all such processes in either of these states in the appropriate output location.
 
 If you get your output correct, you can see if your system tests pass correctly.
 The system tests work simply by doing a `diff` of the simulation output with
@@ -478,7 +775,7 @@ expected for the system tests.  The processes on the ready queue need to be
 listed in the correct order, with the process at the front or head of the queue
 output first, down to the tail or back of the queue as the last process.  
 Likewise the system tests expect blocked processes to be listed by pid, so
-that the smallest blocked proces by pid is listed first, then the next pid, etc.
+that the smallest blocked process by pid is listed first, then the next pid, etc.
 I consider it mostly correct (4/5 bonus points) if the only failing system
 tests are failing because you do not correctly order the output of the blocked
 processes.  But it is definitely incorrect to not order the ready processes by
@@ -525,7 +822,7 @@ fix issues with your current submission.
    graded.  0 if not satisfied.
 2. 40 points for keeping code that compiles and runs.  A minimum of 50 points
    will be given if at least the first task is completed and passing tests.
-3. 5 to 10 points are awareded for completing each subsequent task 2-8.
+3. 5 to 10 points are awarded for completing each subsequent task 2-8.
 4. +5 bonus pts if all system tests pass and your process simulator produces
    correct output for the given system tests.
 
@@ -562,7 +859,7 @@ function you write for this assignment looks like this:
 /**
  * @brief initialize memory
  *
- * Initialize the contents of memory.  Allocate array larget enough to
+ * Initialize the contents of memory.  Allocate array large enough to
  * hold memory contents for the program.  Record base and bounds
  * address for memory address translation.  This memory function
  * dynamically allocates enough memory to hold the addresses for the

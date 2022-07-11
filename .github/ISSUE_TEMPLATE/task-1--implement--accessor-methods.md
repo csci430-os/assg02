@@ -11,11 +11,17 @@ assignees: ''
 
 Implement the following missing getter and accessor methods:
 
-- class constructor
+- class constructor, initialize the `timeSliceQuantum` as given.  Initialize all other
+  member variables as appropriate and as seen in the tests for the initial state of
+  the simulation.
+- `getTimeSliceQuantum()`
 - `getNextProcessId()`
+- `getSystemTime()`
 - `getNumActiveProcesses()`
+- `getNumFinishedProcesses()`
 - `readyQueueSize()`
-- `blockedListSize()`
+- `readyQueueFront()`
+- `readyQueueBack()`
 
 
 **Suggested Solution**
@@ -26,3 +32,9 @@ Implement the following missing getter and accessor methods:
 - You are required to correctly modify the `ProcessSimulator` class constructor to
   intialize the time slice quantum for a simulation as indicated, and initialize all
   other member variables to 0 or their initial value before the simulation starts.
+- You are required to use the `processControlBlock` map to hold the actual process
+  instances of the simulation.
+- You are required to use the `readyQueue` STL list to hold a queue of process identifiers
+  that are ready and waiting for the cpu.
+- You are required to use the `cpu` member variable to keep track of the process id of
+  the current running process (or IDLE when no process is running).

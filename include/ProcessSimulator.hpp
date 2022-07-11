@@ -50,6 +50,26 @@ private:
   /// @brief Keeps track of the number of processes that have exited the system.
   int numFinishedProcesses;
 
+  /// @brief Use a map for our process control block.  This makes dynamically
+  ///   adding new processes and/or removing done processes simple
+  map<Pid, Process> processControlBlock;
+
+  /// @brief Use a standard list for a ready queue.  We use a list instead
+  ///   of a actual queue so that we can more easily iterate over the
+  ///   current processes on the queue
+  list<Pid> readyQueue;
+
+  /// @brief Use another map for the blocked process map.  We do this so
+  ///   that we can easily look up which process is blocked waiting on
+  ///   which particular event id.
+  map<EventId, Pid> blockedList;
+
+  /// @brief Keep track of what process is currently running.  The cpu member
+  ///   variable will be IDLE (pid 0) when no process is running, or will have
+  ///   the pid of the process that is running if there is currently a process
+  ///   allocated the cpu
+  Pid cpu;
+
 public:
   // constructors and destructors
   ProcessSimulator(Pid timeSliceQuantum);
@@ -64,11 +84,8 @@ public:
   int getNumFinishedProcesses() const;
 
   // accessor methods for Processes managed by the simulator
-  const Process& getProcess(Pid pid) const;
 
   // cpu, ready queue and blocked list management functions
-  Pid runningProcess() const;
-  bool isCpuIdle() const;
   int readyQueueSize() const;
   Pid readyQueueFront() const;
   Pid readyQueueBack() const;

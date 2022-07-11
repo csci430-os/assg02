@@ -16,16 +16,6 @@
 #include "catch.hpp"
 using namespace std;
 
-#undef task1
-#undef task2
-#undef task3
-#undef task4
-#undef task5
-#undef task6
-#undef task7
-#undef task8
-
-
 /**
  * @brief test Process class operations.  These are general tests of the Process class
  *   that you will be using when implementing the ProcessSimulator member methods to
@@ -151,22 +141,40 @@ ProcessSimulator sim(5);
 /**
  * @brief Task 1: ProcessSimulator initial state and getter accessor methods
  */
+#undef task1
 #ifdef task1
-TEST_CASE("Task 1: ProcessSimulator initial state and getter accessor methods", "[task1]")
+TEST_CASE("Task 1: constructor and getter accessor methods", "[task1]")
 {
   // check that the initial state of a simulation is as expected
   CHECK(sim.getTimeSliceQuantum() == 5);
   CHECK(sim.getNextProcessId() == 1);
   CHECK(sim.getSystemTime() == 1);
+}
+
+TEST_CASE("Task 1: process control block number of active and finished processes", "[task1]")
+{
+  // process control block
   CHECK(sim.getNumActiveProcesses() == 0);
   CHECK(sim.getNumFinishedProcesses() == 0);
-  CHECK(sim.runningProcess() == IDLE);
+}
+
+TEST_CASE("Task 1: ready queue accessor methods", "[task1]")
+{
+  // ready queue
   CHECK(sim.readyQueueSize() == 0);
   CHECK(sim.readyQueueFront() == IDLE);
   CHECK(sim.readyQueueBack() == IDLE);
-  CHECK(sim.blockedListSize() == 0);
+}
 
-  // the isInState is a convenience methd for unit testing, to test that
+TEST_CASE("Task 1: blocked list accessor methods", "[task1]")
+{
+  // blocked list
+  CHECK(sim.blockedListSize() == 0);
+}
+
+TEST_CASE("Task 1: initial simulation state", "[task1]")
+{
+  // the isInState is a convenience method for unit testing, to test that
   // all of these important state values are as expected in the simulation
   // at any point
   CHECK(sim.isInState(5, 1, 0, 0, IDLE, 0, IDLE, IDLE, 0));
@@ -176,8 +184,9 @@ TEST_CASE("Task 1: ProcessSimulator initial state and getter accessor methods", 
 /**
  * @brief Task 2: ProcessSimulator <newEvent()> member method tests
  */
-#ifdef task2
-TEST_CASE("Task 2: <newEvent()> tests handling of the new simulation event", "[task2]")
+#undef task2_1
+#ifdef task2_1
+TEST_CASE("Task 2: <newEvent()> check member variable and control block update", "[task2]")
 {
   // create a new process and test it is assigned pid 1, put in READY state and
   // put on the ready queue
@@ -191,7 +200,13 @@ TEST_CASE("Task 2: <newEvent()> tests handling of the new simulation event", "[t
   // we should be able to determine the number of processes that are currently
   // being managed.
   CHECK(sim.getNumActiveProcesses() == 1);
+}
+#endif
 
+#undef task2_2
+#ifdef task2_2
+TEST_CASE("Task 2: <getProcess()> check process put in processControlBlock", "[task2]")
+{
   // But more than that, you need to keep track of processes when a
   // process is created, you need a process control block, or a list
   // or array of processes.  The process that was just created should
@@ -199,7 +214,13 @@ TEST_CASE("Task 2: <newEvent()> tests handling of the new simulation event", "[t
   // and the timeUsed and quantumUsed set to 0 to begin with.
   // If asked you need to be able to return the Proceess
   Process p1 = sim.getProcess(1); // get process Pid=1 from the simulation
+  CHECK(p1.getPid() == 1);
+}
+
+TEST_CASE("Task 2: <getProcess()> check process added to ready queue", "[task2]")
+{
   // this process should be in READY state, with a startTime of 1, etc.
+  Process p1 = sim.getProcess(1); // get process Pid=1 from the simulation
   CHECK(p1.isInState(1, READY, 1, 0, 0, NA_EVENT));
 
   // In addition you now need to have a ready queue container working.  New
@@ -208,7 +229,10 @@ TEST_CASE("Task 2: <newEvent()> tests handling of the new simulation event", "[t
   CHECK(sim.readyQueueSize() == 1);
   CHECK(sim.readyQueueFront() == 1);
   CHECK(sim.readyQueueBack() == 1);
+}
 
+TEST_CASE("Task 2: <newProcess()> and <getProcess()> add an additional process", "[task2]")
+{
   // now we add a second process.  This will ensure that we probably have a real
   // queue working for the ready queue at this point
   sim.newEvent();
@@ -229,10 +253,9 @@ TEST_CASE("Task 2: <newEvent()> tests handling of the new simulation event", "[t
 /**
  * @brief Task 3: ProcessSimulator <dispatch()> member function
  */
-#ifdef task3
-TEST_CASE("Task 3: <dispatch()> tests correctly handle dispatch of new "
-          "processes when cpu IDLE",
-  "[task3]")
+#undef task3_1
+#ifdef task3_1
+TEST_CASE("Task 3: cpu initialized <isCpuIdle> and <runningProcess> created", "[task3]")
 {
   // dispatch() should cause process at front of the ready queue to become the
   // running process.  Lots of things happen with this first dispatch.
@@ -242,7 +265,13 @@ TEST_CASE("Task 3: <dispatch()> tests correctly handle dispatch of new "
   // runningProcess() are both working. The cpu should currently be idle
   CHECK(sim.isCpuIdle());
   CHECK(sim.runningProcess() == IDLE);
+}
+#endif
 
+#undef task3_2
+#ifdef task3_2
+TEST_CASE("Task 3: <dispatch()> gets process when cpu idle and process on queue", "[task3]")
+{
   // now try to dispatch()
   sim.dispatch();
 
@@ -256,7 +285,18 @@ TEST_CASE("Task 3: <dispatch()> tests correctly handle dispatch of new "
   CHECK(sim.readyQueueBack() == 2);
 
   CHECK(sim.isInState(5, 1, 2, 0, 1, 1, 2, 2, 0));
+}
 
+TEST_CASE("Task 3: <dispatch()> correctly sets dispatched process to running", "[task3]")
+{
+  // check that the process that is running was correctly put into the running state
+  Pid pid = sim.runningProcess();
+  Process p = sim.getProcess(pid);
+  CHECK(p.isInState(1, RUNNING, 1, 0, 0, NA_EVENT));
+}
+
+TEST_CASE("Task 3: <dispatch()> dispatch does nothing when cpu is running", "[task3]")
+{
   // a process is running now, so dispatch should not cause any change
   sim.dispatch();
   CHECK_FALSE(sim.isCpuIdle());
@@ -265,13 +305,21 @@ TEST_CASE("Task 3: <dispatch()> tests correctly handle dispatch of new "
   CHECK(sim.readyQueueFront() == 2);
   CHECK(sim.readyQueueBack() == 2);
   CHECK(sim.isInState(5, 1, 2, 0, 1, 1, 2, 2, 0));
+}
 
+TEST_CASE("Task 3: <dispatch()> cpu still idle if dispatch when queue is empty", "[task3]")
+{
   // finally we will check this more later, but if the ready queue
   // is empty then an idle cpu will remain idle.  We will create another
   // simulation to check this
   ProcessSimulator sim2(8);
   CHECK(sim2.isInState(8, 1, 0, 0, IDLE, 0, IDLE, IDLE, 0));
   sim2.dispatch();
+  CHECK(sim2.isCpuIdle());
+  CHECK(sim2.runningProcess() == IDLE);
+  CHECK(sim2.readyQueueSize() == 0);
+  CHECK(sim2.readyQueueFront() == IDLE);
+  CHECK(sim2.readyQueueBack() == IDLE);
   CHECK(sim2.isInState(8, 1, 0, 0, IDLE, 0, IDLE, IDLE, 0));
 }
 #endif
@@ -281,26 +329,40 @@ TEST_CASE("Task 3: <dispatch()> tests correctly handle dispatch of new "
  * that time used and quantum used is being incremented.  Later
  * tests will test other aspects of this function.
  */
+#undef task4
 #ifdef task4
-TEST_CASE("Task 4: <cpuEvent()> tests simulation of a cpu cycle", "[task4]")
+TEST_CASE("Task 4: <cpuEvent()> test 3 cpu cycles", "[task4]")
 {
   // in sim Pid 1 is currently running.  Cause it to run 3 cpu cycles
   sim.cpuEvent();
   sim.cpuEvent();
   sim.cpuEvent();
+
   // simulation is still in same state
+  CHECK(sim.getSystemTime() == 4);
   CHECK(sim.isInState(5, 4, 2, 0, 1, 1, 2, 2, 0));
+}
+
+TEST_CASE("Task 4: <cpuEvent()> check process did cpu cycles", "[task4]")
+{
   // but process should now have 3 time cycles and 3 quantums used
   Process p1 = sim.getProcess(1);
   CHECK(not p1.isQuantumExceeded(5));
   CHECK(p1.isInState(1, RUNNING, 1, 3, 3, NA_EVENT));
+}
+
+TEST_CASE("Task 4: <cpuEvent()> test 3 additional cpu cycles", "[task4]")
+{
 
   // 3 more cpu cycles
   sim.cpuEvent();
   sim.cpuEvent();
   sim.cpuEvent();
+  CHECK(sim.getSystemTime() == 7);
   CHECK(sim.isInState(5, 7, 2, 0, 1, 1, 2, 2, 0));
-  p1 = sim.getProcess(1);
+
+  // notice p1 has now run 6 time slices
+  Process p1 = sim.getProcess(1);
   CHECK(p1.isQuantumExceeded(5));
   CHECK(p1.isInState(1, RUNNING, 1, 6, 6, NA_EVENT));
 }
@@ -309,10 +371,9 @@ TEST_CASE("Task 4: <cpuEvent()> tests simulation of a cpu cycle", "[task4]")
 /**
  * @brief Task 5: test ProcessSimulator <timeout()> member function event
  */
+#undef task5
 #ifdef task5
-TEST_CASE("Task 5: <timeout()> tests simulation handling of timeout of "
-          "processes",
-  "[task5]")
+TEST_CASE("Task 5: <timeout()> basic test of process timeout ", "[task5]")
 {
   // the running process has currently exceeded its time quantum, time it out
   sim.timeout();
@@ -320,14 +381,20 @@ TEST_CASE("Task 5: <timeout()> tests simulation handling of timeout of "
   CHECK(p1.isInState(1, READY, 1, 6, 0, NA_EVENT));
   CHECK(sim.isCpuIdle());
   CHECK(sim.isInState(5, 7, 2, 0, IDLE, 2, 2, 1, 0));
+}
 
+TEST_CASE("Task 5: <timeout()> timeout when idle does nothing ", "[task5]")
+{
   // timeout when cpu is idle should do nothing
   sim.timeout();
-  p1 = sim.getProcess(1);
+  Process p1 = sim.getProcess(1);
   CHECK(p1.isInState(1, READY, 1, 6, 0, NA_EVENT));
   CHECK(sim.isCpuIdle());
   CHECK(sim.isInState(5, 7, 2, 0, IDLE, 2, 2, 1, 0));
+}
 
+TEST_CASE("Task 5: <timeout()> dispatch process 2 and test doesn't time out ", "[task5]")
+{
   // cpu is idle and ready queue is not empty, so we can test
   // dispatch again, should dispatch Pid 2 now since it is as
   // the front of the queue
@@ -350,7 +417,10 @@ TEST_CASE("Task 5: <timeout()> tests simulation handling of timeout of "
   // have any effect at this point
   sim.timeout();
   CHECK(sim.isInState(5, 11, 2, 0, 2, 1, 1, 1, 0));
+}
 
+TEST_CASE("Task 5: <timeout()> timeout process 2 ", "[task5]")
+{
   // simulate the typical steps we need before and after a cpu cycle
   // dispatch should have no effect since cpu is not idle
   sim.dispatch();
@@ -359,7 +429,7 @@ TEST_CASE("Task 5: <timeout()> tests simulation handling of timeout of "
   // run 5th cpu cycle for pid 2 which will now have reached its time slice
   // quantum
   sim.cpuEvent();
-  p2 = sim.getProcess(2);
+  Process p2 = sim.getProcess(2);
   CHECK(p2.isQuantumExceeded(5));
   CHECK(p2.isInState(2, RUNNING, 1, 5, 5, NA_EVENT));
 
@@ -370,7 +440,6 @@ TEST_CASE("Task 5: <timeout()> tests simulation handling of timeout of "
   p2 = sim.getProcess(2);
   CHECK(p2.isInState(2, READY, 1, 5, 0, NA_EVENT));
 }
-#endif
 
 /**
  * @brief Task 5: test ProcessSimulator test of dispatch/cpu/timeout processing. We are
@@ -378,8 +447,7 @@ TEST_CASE("Task 5: <timeout()> tests simulation handling of timeout of "
  * the 2 processes.  Current state of sim is 2 processes with both in the
  * ready queue and pid 1 is at the head of the queue.
  */
-#ifdef task5
-TEST_CASE("Task 5: ProcessSimulator tests of dispatch/cpu/timeout system cycles", "[task5]")
+TEST_CASE("Task 5: dispatch/cpu/timeout system cycles", "[task5]")
 {
   // before we begin lets add 1 more process, pid 3, to end of ready queue
   sim.newEvent();
@@ -455,8 +523,9 @@ TEST_CASE("Task 5: ProcessSimulator tests of dispatch/cpu/timeout system cycles"
 /**
  * @brief Task 6: test ProcessSimulator <blockEvent()> member function
  */
+#undef task6
 #ifdef task6
-TEST_CASE("Task 6: <blockEvent()> tests simulation of process blocking on I/O", "[task6]")
+TEST_CASE("Task 6: <blockEvent()> basic block", "[task6]")
 {
   // in sim, p3 is currently running, cause it to become blocked on eventId 7
   sim.blockEvent(7);
@@ -465,7 +534,19 @@ TEST_CASE("Task 6: <blockEvent()> tests simulation of process blocking on I/O", 
   CHECK(p3.isInState(3, BLOCKED, 12, 1, 0, 7));
   CHECK(sim.isCpuIdle());
   CHECK(sim.isInState(5, 23, 3, 0, IDLE, 2, 1, 2, 1));
+}
 
+TEST_CASE("Task 6: <blockEvent()> block when cpu idle is error", "[task6]")
+{
+  // in this simulation it doesn't make sense to receive a simulation of a
+  // blocking event if no process is running.  The blockEvent() process should
+  // throw an exception if a blockEvent() is attempted when the cpu is idle. The
+  // cpu should currently
+  CHECK_THROWS_AS(sim.blockEvent(5), SimulatorException);
+}
+
+TEST_CASE("Task 6: <blockEvent()> block process 1 now", "[task6]")
+{
   // dispatch another process, process 1 should be at head of queue.
   sim.dispatch();
   sim.cpuEvent();
@@ -478,13 +559,19 @@ TEST_CASE("Task 6: <blockEvent()> tests simulation of process blocking on I/O", 
   p1 = sim.getProcess(1);
   CHECK(p1.isInState(1, BLOCKED, 1, 13, 0, 23));
   CHECK(sim.isInState(5, 25, 3, 0, IDLE, 1, 2, 2, 2));
+}
 
+TEST_CASE("Task 6: <blockEvent()> block when idle again", "[task6]")
+{
   // in this simulation it doesn't make sense to receive a simulation of a
   // blocking event if no process is running.  The blockEvent() process should
   // throw an exception if a blockEvent() is attempted when the cpu is idle. The
   // cpu should currently
   CHECK_THROWS_AS(sim.blockEvent(5), SimulatorException);
+}
 
+TEST_CASE("Task 6: <blockEvent()> two processes blocked on same event not allowed", "[task6]")
+{
   // likewise to simplify things a bit we only allow 1 process to be blocked on
   // a given eventId event type at any time.  the blockEvent() should throw
   // an exception if another process is already blocked waiting on the indicated
@@ -506,29 +593,44 @@ TEST_CASE("Task 6: <blockEvent()> tests simulation of process blocking on I/O", 
 /**
  * @brief Task 7: test ProcessSimulator <unblockEvent()> member function
  */
+#undef task7
 #ifdef task7
-TEST_CASE("Task 7: <unblockEvent()> tests simulation of process "
-          "unblocking on I/O",
-  "[task7]")
+TEST_CASE("Task 7: <unblockEvent()> error if unblock occurs and no process is waiting on event", "[task7]")
+{
+  CHECK_THROWS_AS(sim.unblockEvent(1), SimulatorException);
+  CHECK_THROWS_AS(sim.unblockEvent(15), SimulatorException);
+}
+
+TEST_CASE("Task 7: <unblockEvent()> test basic unblock of process 3", "[task7]")
 {
   // ready queue is empty at this point, p2 is running, p1 is blocked on eventId
   // 23 and p3 is blocked on eventId 7.  Just confirm current system state is as
   // we expect
   CHECK(sim.isInState(5, 27, 3, 0, 2, 0, IDLE, IDLE, 2));
 
-  // unblock pid 3 first, then pid 1
+  // unblock pid 3 first
   sim.unblockEvent(7);
   Process p3 = sim.getProcess(3);
   CHECK(p3.isInState(3, READY, 12, 1, 0, NA_EVENT));
+}
 
+TEST_CASE("Task 7: <unblockEvent()> test basic unblock of process 1", "[task7]")
+{
+  // unblock process 1
   sim.unblockEvent(23);
   Process p1 = sim.getProcess(1);
   CHECK(p1.isInState(1, READY, 1, 13, 0, NA_EVENT));
+}
 
+TEST_CASE("Task 7: <unblockEvent()> block then unblock process 2", "[task7]")
+{
   // block and unblock pid 2
   sim.blockEvent(16);
-  sim.unblockEvent(16);
   Process p2 = sim.getProcess(2);
+  CHECK(p2.isInState(2, BLOCKED, 1, 12, 0, 16));
+
+  sim.unblockEvent(16);
+  p2 = sim.getProcess(2);
   CHECK(p2.isInState(2, READY, 1, 12, 0, NA_EVENT));
 
   CHECK(sim.isInState(5, 27, 3, 0, IDLE, 3, 3, 2, 0));
@@ -539,10 +641,9 @@ TEST_CASE("Task 7: <unblockEvent()> tests simulation of process "
  * @brief Task 8: ProcessSimulator <doneEvent()> member function tests
  * system.
  */
+#undef task8
 #ifdef task8
-TEST_CASE("Task 8: <doneEvent()> tests simulation of process finishing "
-          "and exiting the system",
-  "[task8]")
+TEST_CASE("Task 8: <doneEvent()> dispatch and finish process 3", "[task8]")
 {
   // no process is currently running, lets dispatch a process and finish it off
   sim.dispatch();
@@ -551,7 +652,10 @@ TEST_CASE("Task 8: <doneEvent()> tests simulation of process finishing "
   CHECK(sim.isInState(5, 29, 3, 0, 3, 2, 1, 2, 0));
   sim.doneEvent();
   CHECK(sim.isInState(5, 29, 2, 1, IDLE, 2, 1, 2, 0));
+}
 
+TEST_CASE("Task 8: <doneEvent()> dispatch and finish process 1", "[task8]")
+{
   // lets finish a second process
   sim.dispatch();
   sim.cpuEvent();
@@ -560,7 +664,10 @@ TEST_CASE("Task 8: <doneEvent()> tests simulation of process finishing "
   CHECK(sim.isInState(5, 32, 2, 1, 1, 1, 2, 2, 0));
   sim.doneEvent();
   CHECK(sim.isInState(5, 32, 1, 2, IDLE, 1, 2, 2, 0));
+}
 
+TEST_CASE("Task 8: <doneEvent()> error for done to occur when cpu idle", "[task8]")
+{
   // if cpu is idle then doneEvent() does not make sense.  simulator should
   // throw an exception if we attempt to perform done when no process is running
   CHECK(sim.isCpuIdle());

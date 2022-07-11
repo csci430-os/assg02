@@ -70,7 +70,7 @@ void ProcessSimulator::reset() {}
 Pid ProcessSimulator::getTimeSliceQuantum() const
 {
   // task 1 this getter should return the member variable
-  return 0;
+  return -1;
 }
 
 /**
@@ -84,7 +84,7 @@ Pid ProcessSimulator::getTimeSliceQuantum() const
 Pid ProcessSimulator::getNextProcessId() const
 {
   // task 1 this getter should return the member variable
-  return 0;
+  return -1;
 }
 
 /**
@@ -97,7 +97,7 @@ Pid ProcessSimulator::getNextProcessId() const
 Time ProcessSimulator::getSystemTime() const
 {
   // task 1 this getter should return the member variable
-  return systemTime;
+  return -1;
 }
 
 /**
@@ -116,7 +116,7 @@ int ProcessSimulator::getNumActiveProcesses() const
   // task 1 this getter should return a dummy value until you implement
   // a process control block and/or actually create new processes and keep
   // track of the number of processes you have in the system somehow
-  return 0;
+  return -1;
 }
 
 /**
@@ -133,7 +133,7 @@ int ProcessSimulator::getNumFinishedProcesses() const
   // task 1 this getter should return a dummy value until you implement
   // a process control block and/or actually create new processes and keep
   // track of the number of processes you have in the system somehow
-  return 0;
+  return -1;
 }
 
 /**
@@ -149,15 +149,6 @@ int ProcessSimulator::getNumFinishedProcesses() const
  * @returns Process Retuns a reference to a Process object, which should be
  *   the process with the pid that was requested.
  */
-const Process& ProcessSimulator::getProcess(Pid pid) const
-{
-  // task 2: need a process control block so you can keep
-  // track of and return process when asked for a pid here
-  // Once you have a process control block, you need to return
-  // a reference to the actual processes indicated by the pid here
-  Process* p = new Process;
-  return *p;
-}
 
 /**
  * @brief cpu running process
@@ -171,14 +162,6 @@ const Process& ProcessSimulator::getProcess(Pid pid) const
  *   allocated the cpu.  If the cpu is currently idle, then the
  *   IDLE Pid identifier is returned.
  */
-Pid ProcessSimulator::runningProcess() const
-{
-  // task 1 & 4, this should initially return IDLE to indicate
-  // system cpu is idle, but ultimately when you implement real
-  // dispatching in task 4 you need to keep track of which process is
-  // running, and return its pid here
-  return IDLE;
-}
 
 /**
  * @brief is cpu idle
@@ -189,14 +172,6 @@ Pid ProcessSimulator::runningProcess() const
  * @returns bool true if cpu is currently IDLE and not allocated a process,
  *   false otherwise.
  */
-bool ProcessSimulator::isCpuIdle() const
-{
-  // task 1 & 4, this should initially return true to indicate
-  // system cpu is idle, but ultimately when you implement real
-  // dispatching in task 4 you need to keep track of which process is
-  // running, and return its pid here
-  return true;
-}
 
 /**
  * @brief ready queue size
@@ -234,13 +209,13 @@ Pid ProcessSimulator::readyQueueFront() const
 }
 
 /**
- * @brief ready queue tail
+ * @brief ready queue back
  *
  * Accessor method returns Pid of the current process at the
- * tail of the ready queue.
+ * back of the ready queue.
  *
  * @returns Pid Returns the process identifier of the process
- *   at the tail end of the ready queue.  This function returns
+ *   at the back end of the ready queue.  This function returns
  *   the IDLE Pid if the ready queue is empty.
  */
 Pid ProcessSimulator::readyQueueBack() const
@@ -269,6 +244,29 @@ int ProcessSimulator::blockedListSize() const
   // and be able to report the total number of blocked processes here
   return 0;
 }
+
+/**
+ * @brief is cpu idle
+ *
+ * Accessor method returns true if the cpu is currently idle or false
+ * otherwise.
+ *
+ * @returns bool true if cpu is currently IDLE and not allocated a process,
+ *   false otherwise.
+ */
+
+/**
+ * @brief cpu running process
+ *
+ * Accessor method to return the Pid of the process currently
+ * allocated the cpu and thus currently running on the cpu.
+ * This method returns the IDLE pid if the cpu is currently
+ * not allocated and is thus idle.
+ *
+ * @returns Pid Returns the process identifier of the process
+ *   allocated the cpu.  If the cpu is currently idle, then the
+ *   IDLE Pid identifier is returned.
+ */
 
 /**
  * @brief test simulation state
@@ -304,7 +302,7 @@ bool ProcessSimulator::isInState(Time timeSliceQuantum, Time systemTime, int num
 {
   bool stateIsCorrect = (timeSliceQuantum == this->getTimeSliceQuantum()) and (systemTime == this->getSystemTime()) and
                         (numActiveProcesses == this->getNumActiveProcesses()) and
-                        (numFinishedProcesses == this->getNumFinishedProcesses()) and (runningProcess == this->runningProcess()) and
+                        (numFinishedProcesses == this->getNumFinishedProcesses()) and (runningProcess == cpu) and
                         (readyQueueSize == this->readyQueueSize()) and (readyQueueFront == this->readyQueueFront()) and
                         (readyQueueBack == this->readyQueueBack()) and (blockedListSize == this->blockedListSize());
 
@@ -327,13 +325,13 @@ bool ProcessSimulator::isInState(Time timeSliceQuantum, Time systemTime, int num
  *
  * Perform tasks needed whenever a "new" even occurs in the simulation.
  * A new event should cause:
- *   - Allocate the next process id for the new process
  *   - A new process to be created and the process added to the process control
  *     list or process control block of the system.
  *   - New process is initialized with the current system time and other init
  *     information as needed.
  *   - The new process is put into the READY state.
  *   - The new process is added to the back of the ready queue.
+ *   - Update the next process id for next new process creation.
  */
 
 /**
@@ -382,7 +380,7 @@ bool ProcessSimulator::isInState(Time timeSliceQuantum, Time systemTime, int num
  *   needs to block on and wait to occur.
  *
  * @throws SimulatorException is thrown if a block is attempted when the
- *   cpu is idle.
+ *   cpu is idle or if there is already a process waiting on this event.
  */
 
 /**
@@ -446,36 +444,36 @@ void ProcessSimulator::runSimulation(string simulationFile)
 
   while (simulationStream >> event)
   {
-    /* Task 9 / system tests  Uncomment the following calls to the 
+    /* Task 9 / system tests  Uncomment the following calls to the
        ProcessSimulator member functions you have implemented
     */
-    
+
     // before next event, determine if we need to dispatch a process
     // and schedule it to run
-    //dispatch();
+    // dispatch();
 
     // handle the next simulated event
     if (event == "new")
     {
-      //newEvent();
+      // newEvent();
     }
     else if (event == "cpu")
     {
-      //cpuEvent();
+      // cpuEvent();
     }
     else if (event == "block")
     {
       simulationStream >> eventId;
-      //blockEvent(eventId);
+      // blockEvent(eventId);
     }
     else if (event == "unblock")
     {
       simulationStream >> eventId;
-      //unblockEvent(eventId);
+      // unblockEvent(eventId);
     }
     else if (event == "done")
     {
-      //doneEvent();
+      // doneEvent();
     }
     else
     {
@@ -487,8 +485,8 @@ void ProcessSimulator::runSimulation(string simulationFile)
 
     // after event, determine if the current running event needs to be
     // timed out and returned to back of the ready queue
-    //timeout();
-    
+    // timeout();
+
     // display current simulation system state to standard output
     cout << "------------------------------------------------------------------"
             "------"
@@ -526,22 +524,18 @@ string ProcessSimulator::toString() const
          << "  numActiveProcesses    : " << getNumActiveProcesses() << endl
          << "  numFinishedProcesses  : " << getNumFinishedProcesses() << endl
          << endl
-         << "  CPU" << endl
-         << "    "
+         << "  CPU"
          << endl
-         // need to add code to display process on CPU here for system tests
+         // need to display the current process running on CPU or IDLE here
          << "  CPU" << endl
          << endl;
 
-  // display the ready queue
+  // display the ready queue processes here
   stream << "  Ready Queue Head" << endl;
-  // need to add code to display processes on ready queue here for system tests
   stream << "  Ready Queue Tail" << endl << endl;
 
-  // display the blocked list
+  // display the blocked list processes here
   stream << "  Blocked List" << endl;
-  // need to add code to display blocked processes (sorted by pid) here for
-  // system tests
   stream << "  Blocked List" << endl << endl;
 
   // convert our string stream back to a regular string for return to caller

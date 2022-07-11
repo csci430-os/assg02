@@ -18,8 +18,24 @@ the ready queue.
 
 **Suggested Solution**
 
+The pseudocode for the `timeout()` function is:
+
+```
+// if cpu is idle, no process to check currently
+if cpu is idle
+    return
+	
+// otherwise check the current running process
+look up running process in the processControlBlock
+if process time slice quantum is exceeded:
+   timeout the process
+   put the process on the back of the ready queue
+   set the cpu to IDLE
+```
+
 
 **Additional Requirements**
 
+- You are required to silently return when the cpu is IDLE as in that case no process is currently running so nothing can be timed out.
 - You are required to use the `isQuantumExceeded()` and `timeout()` member methods of the `Process` class/instance in the implementation of the simulations timeout procedure.
 
