@@ -460,7 +460,7 @@ systemTime++
 // process to update its time used and quantum used
 if cpu is not idle
   access the process from the processControlBlock
-  call the cpuEvent() method on the process that is currently running
+  call the cpuCycle() method on the process that is currently running
 ```
 
 Once you are satisfied with your work, push your commits to GitHub and
