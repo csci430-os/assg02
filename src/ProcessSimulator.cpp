@@ -187,7 +187,7 @@ int ProcessSimulator::readyQueueSize() const
   // ready queue and either keep track of the number of processes on the queue,
   // or use an accessor method of your queue, like ths size() method for an STL
   // list, to return the number of jobs on the queue.
-  return 0;
+  return -1;
 }
 
 /**
@@ -202,10 +202,10 @@ int ProcessSimulator::readyQueueSize() const
  */
 Pid ProcessSimulator::readyQueueFront() const
 {
-  // Initially this is hardcoded to return IDLE, but when you
+  // Initially this is hardcoded to return -1, but when you
   // implement your ready queue, you need to be able to get the front
   // process on the queue and return the pid of this process here
-  return IDLE;
+  return -1;
 }
 
 /**
@@ -220,10 +220,10 @@ Pid ProcessSimulator::readyQueueFront() const
  */
 Pid ProcessSimulator::readyQueueBack() const
 {
-  // Initially this is hardcoded to return IDLE, but when you
+  // Initially this is hardcoded to return -1, but when you
   // implement your ready queue, you need to be able to get the back
   // process on the queue and return the pid of this process here
-  return IDLE;
+  return -1;
 }
 
 /**
@@ -244,16 +244,6 @@ int ProcessSimulator::blockedListSize() const
   // and be able to report the total number of blocked processes here
   return 0;
 }
-
-/**
- * @brief is cpu idle
- *
- * Accessor method returns true if the cpu is currently idle or false
- * otherwise.
- *
- * @returns bool true if cpu is currently IDLE and not allocated a process,
- *   false otherwise.
- */
 
 /**
  * @brief cpu running process
