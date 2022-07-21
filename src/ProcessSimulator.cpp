@@ -67,7 +67,7 @@ void ProcessSimulator::reset() {}
  *   quantum parameter.
  */// task 1 this getter should return the member variable
 
-Pid ProcessSimulator::getTimeSliceQuantum() const
+Time ProcessSimulator::getTimeSliceQuantum() const
 {
   // task 1 this getter should return the member variable
   return -1;
