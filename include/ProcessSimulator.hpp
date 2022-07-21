@@ -72,7 +72,7 @@ private:
 
 public:
   // constructors and destructors
-  ProcessSimulator(Pid timeSliceQuantum);
+  ProcessSimulator(Time timeSliceQuantum);
   ~ProcessSimulator();
   void reset();
 

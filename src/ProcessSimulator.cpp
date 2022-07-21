@@ -26,7 +26,7 @@ using namespace std;
  *   used by our simulation as all processes when scheduled will
  *   only be given this basic time slice quantum to execute.
  */
-ProcessSimulator::ProcessSimulator(Pid timeSliceQuantum)
+ProcessSimulator::ProcessSimulator(Time timeSliceQuantum)
 {
   // task 1, need to initialize the timeSliceQuantum,
   // and also need to initialize all other member variables
