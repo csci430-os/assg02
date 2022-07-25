@@ -246,19 +246,6 @@ int ProcessSimulator::blockedListSize() const
 }
 
 /**
- * @brief cpu running process
- *
- * Accessor method to return the Pid of the process currently
- * allocated the cpu and thus currently running on the cpu.
- * This method returns the IDLE pid if the cpu is currently
- * not allocated and is thus idle.
- *
- * @returns Pid Returns the process identifier of the process
- *   allocated the cpu.  If the cpu is currently idle, then the
- *   IDLE Pid identifier is returned.
- */
-
-/**
  * @brief test simulation state
  *
  * Convenience method for unit testing, test most of the important
