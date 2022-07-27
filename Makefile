@@ -23,6 +23,8 @@ assg_doc = ${PROJECT_NAME}.pdf
 include include/Makefile.inc
 
 # assignment header file specific dependencies
+${OBJ_DIR}/${PROJECT_NAME}-tests.o: ${INC_DIR}/Process.hpp ${INC_DIR}/ProcessSimulator.hpp ${INC_DIR}/ProcessState.hpp
+${OBJ_DIR}/${PROJECT_NAME}-sim.o: ${INC_DIR}/ProcessSimulator.hpp
 ${OBJ_DIR}/Process.o: ${INC_DIR}/Process.hpp ${INC_DIR}/ProcessState.hpp ${SRC_DIR}/Process.cpp
 ${OBJ_DIR}/ProcessSimulator.o: ${INC_DIR}/ProcessSimulator.hpp ${INC_DIR}/Process.hpp ${INC_DIR}/ProcessState.hpp ${SRC_DIR}/ProcessSimulator.cpp
 ${OBJ_DIR}/ProcessState.o: ${INC_DIR}/ProcessState.hpp ${SRC_DIR}/ProcessState.cpp
