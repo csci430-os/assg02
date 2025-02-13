@@ -82,6 +82,7 @@ public:
   Time getSystemTime() const;
   int getNumActiveProcesses() const;
   int getNumFinishedProcesses() const;
+  Pid getRunningProcessId() const;
 
   // accessor methods for Processes managed by the simulator
 

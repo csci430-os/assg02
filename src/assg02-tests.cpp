@@ -147,8 +147,9 @@ TEST_CASE("Task 1: task 1 test case section", "[task1]")
   SECTION("Task 1: constructor and getter accessor methods", "[task1]")
   { // check that the initial state of a simulation is as expected
     CHECK(sim.getTimeSliceQuantum() == 5);
-    CHECK(sim.getNextProcessId() == 1);
     CHECK(sim.getSystemTime() == 1);
+    CHECK(sim.getNextProcessId() == 1);
+    CHECK(sim.getRunningProcessId() == IDLE);
   }
 
   SECTION("Task 1: process control block number of active and finished processes", "[task1]")

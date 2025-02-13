@@ -216,9 +216,9 @@ You should start task 1 by getting the initial getter function tests
 to work in the test case for task 1 (second test case in the test
 file).  We did not give you the implementation of the constructor for
 the `ProcessSimulator` class, so you will need to start with a
-constructor that specifies the system time slice quantum and saves
-that value.  Many of the other member variables besides the
-`timeSliceQuantum` need to be initialized to default variables then in
+constructor that initializes the system time slice quantum. 
+Most all of the other member variables (except the stl containers)
+need to be initialized to default values in
 the constructor.  The tests for task 1 show what the expected default
 starting values should be for many of the member variables.
 
@@ -228,8 +228,16 @@ initialize things properly in the constructor, by implementing the
 
 Once you have the test for the time slice quantum working, initialize
 the next process id and the system time to 1 in the constructor.
-Then implement `getNextProcessId()` and `getSystemTime()` getter
-methods.
+Then implement `getNextProcessId()`, `getSystemTime()` and
+`getRunningProcessId()` getter methods.
+
+**NOTE**: You should initilize all of simple member variables in this
+step.  The `map`s and `list` will be initialized as empty
+containers with nothing in them, so you don't need to do anything
+to them.  But all other member variables should be initialized, and if they
+have a getter method you should check that it is working.  In particular,
+the `cpu` member variable also needs to be initialized to get the task 1
+tests to pass before moving on to the next step.
 
 ### Task 1.2 Process Control Block accessors
 

@@ -65,9 +65,21 @@ void ProcessSimulator::reset() {}
  *
  * @returns Time returns the setting of the system time slice scheduling
  *   quantum parameter.
- */// task 1 this getter should return the member variable
-
+ */
 Time ProcessSimulator::getTimeSliceQuantum() const
+{
+  // task 1 this getter should return the member variable
+  return -1;
+}
+
+/**
+ * @brief current system time
+ *
+ * Accessor method to return the current system time setting.
+ *
+ * @returns Time Returns the current system time.
+ */
+Time ProcessSimulator::getSystemTime() const
 {
   // task 1 this getter should return the member variable
   return -1;
@@ -88,13 +100,14 @@ Pid ProcessSimulator::getNextProcessId() const
 }
 
 /**
- * @brief current system time
+ * @brief current running process
  *
- * Accessor method to return the current system time setting.
+ * Accessor method to return the process that is currently assigned to
+ * and running on the cpu.
  *
- * @returns Pid Returns the integer id of the next process id to be assigned.
+ * @returns Pid Returns the integer id of the current running process.
  */
-Time ProcessSimulator::getSystemTime() const
+Pid ProcessSimulator::getRunningProcessId() const
 {
   // task 1 this getter should return the member variable
   return -1;
@@ -242,7 +255,7 @@ int ProcessSimulator::blockedListSize() const
   // initially this should be hardcoded to return 0, but eventually you need
   // to have some data structure keeping track of the processes that are blocked
   // and be able to report the total number of blocked processes here
-  return 0;
+  return -1;
 }
 
 /**
@@ -275,13 +288,17 @@ int ProcessSimulator::blockedListSize() const
  *   state, false otherwise.
  */
 bool ProcessSimulator::isInState(Time timeSliceQuantum, Time systemTime, int numActiveProcesses, int numFinishedProcesses,
-  Pid runningProcess, int readyQueueSize, Pid readyQueueFront, Pid readyQueueBack, int blockedListSize)
+  Pid runningProcessId, int readyQueueSize, Pid readyQueueFront, Pid readyQueueBack, int blockedListSize)
 {
-  bool stateIsCorrect = (timeSliceQuantum == this->getTimeSliceQuantum()) and (systemTime == this->getSystemTime()) and
+  bool stateIsCorrect = (timeSliceQuantum == this->getTimeSliceQuantum()) and
+                        (systemTime == this->getSystemTime()) and
                         (numActiveProcesses == this->getNumActiveProcesses()) and
-                        (numFinishedProcesses == this->getNumFinishedProcesses()) and (runningProcess == cpu) and
-                        (readyQueueSize == this->readyQueueSize()) and (readyQueueFront == this->readyQueueFront()) and
-                        (readyQueueBack == this->readyQueueBack()) and (blockedListSize == this->blockedListSize());
+                        (numFinishedProcesses == this->getNumFinishedProcesses()) and
+                        (runningProcessId == this->getRunningProcessId()) and
+                        (readyQueueSize == this->readyQueueSize()) and
+                        (readyQueueFront == this->readyQueueFront()) and
+                        (readyQueueBack == this->readyQueueBack()) and
+                        (blockedListSize == this->blockedListSize());
 
   // if the state was correct, we just return true
   if (stateIsCorrect)
@@ -292,7 +309,18 @@ bool ProcessSimulator::isInState(Time timeSliceQuantum, Time systemTime, int num
   // stdout, to help with debugging of the test that failed.
   else
   {
-    cout << *this << endl;
+    //cout << *this << endl;
+    cout << "<ProcessSimulator::isInState> failed:" << endl
+	 << "    timeSliceQuantum     expected: " << timeSliceQuantum << " actual: " << this->getTimeSliceQuantum() << endl
+	 << "    systemTime           expected: " << systemTime << " actual: " << this->getSystemTime() << endl
+	 << "    numActiveProcesses   expected: " << numActiveProcesses << " actual: " << this->getNumActiveProcesses() << endl
+	 << "    numFinishedProcesses expected: " << numFinishedProcesses << " actual: " << this->getNumFinishedProcesses() << endl
+	 << "    runningProcessId     expected: " << runningProcessId << " actual: " << this->getRunningProcessId() << endl
+	 << "    readyQueueSize       expected: " << readyQueueSize << " actual: " << this->readyQueueSize() << endl
+	 << "    readyQueueFront      expected: " << readyQueueFront << " actual: " << this->readyQueueFront() << endl
+	 << "    readyQueueBack       expected: " << readyQueueBack << " actual: " << this->readyQueueBack() << endl
+	 << "    blockedListSize      expected: " << blockedListSize << " actual: " << this->blockedListSize() << endl;
+      
     return false;
   }
 }
