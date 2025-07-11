@@ -16,6 +16,16 @@
 #include "catch.hpp"
 using namespace std;
 
+// define the tasks in order, one at a time, while working on each task for the assignment
+#undef task1
+#undef task2
+#undef task3
+#undef task4
+#undef task5
+#undef task6
+#undef task7
+#undef task8
+
 /**
  * @brief test Process class operations.  These are general tests of the Process class
  *   that you will be using when implementing the ProcessSimulator member methods to
@@ -136,7 +146,6 @@ TEST_CASE("Task 0: Process constructor and support functions for process managem
 /**
  * @brief Task 1: ProcessSimulator initial state and getter accessor methods
  */
-#undef task1
 #ifdef task1
 TEST_CASE("Task 1: task 1 test case section", "[task1]")
 {
@@ -183,13 +192,12 @@ TEST_CASE("Task 1: task 1 test case section", "[task1]")
 }
 #endif
 
+#ifdef task2
 /**
  * @brief Task 2: ProcessSimulator <newEvent()> member method tests
  */
 TEST_CASE("Task 2: task 2 test case section", "[task2]")
 {
-#undef task2_1
-#ifdef task2_1
 
   /// @brief We use this instantiation of the ProcessSimulator in all
   ///   subsequent test cases below for task 2 tests.
@@ -199,10 +207,6 @@ TEST_CASE("Task 2: task 2 test case section", "[task2]")
 
   SECTION("Task 2: <newEvent()> check member variable and control block update", "[task2]")
   {
-    // create a new process and test it is assigned pid 1, put in READY state and
-    // put on the ready queue
-    // sim.newEvent();
-
     // first of all, you need to be able to keep track of the next pid that needs
     // to be assigned.
     CHECK(sim.getNextProcessId() == 2);
@@ -212,10 +216,7 @@ TEST_CASE("Task 2: task 2 test case section", "[task2]")
     // being managed.
     CHECK(sim.getNumActiveProcesses() == 1);
   }
-#endif
 
-#undef task2_2
-#ifdef task2_2
   SECTION("Task 2: <getProcess()> check process put in processControlBlock", "[task2]")
   {
     // But more than that, you need to keep track of processes when a
@@ -259,16 +260,15 @@ TEST_CASE("Task 2: task 2 test case section", "[task2]")
     // final check make sure all sim state is what we expect at this point
     CHECK(sim.isInState(5, 1, 2, 0, IDLE, 2, 1, 2, 0));
   }
-#endif
 }
+#endif
 
+#ifdef task3
 /**
  * @brief Task 3: ProcessSimulator <dispatch()> member function
  */
 TEST_CASE("Task 3: task 3 test case section", "[task3]")
 {
-#undef task3_1
-#ifdef task3_1
 
   /// @brief We use this instantiation of the ProcessSimulator in all
   ///   subsequent test cases below for task 2 tests.
@@ -277,21 +277,18 @@ TEST_CASE("Task 3: task 3 test case section", "[task3]")
   sim.newEvent();
   sim.newEvent();
 
-  SECTION("Task 3: cpu initialized <isCpuIdle> and <runningProcess> created", "[task3]")
+  SECTION("Task 3: cpu initialized <isCpuIdle> and <getRunningProcessId> created", "[task3]")
   {
     // dispatch() should cause process at front of the ready queue to become the
     // running process.  Lots of things happen with this first dispatch.
-    // Pid 1 changes to be RUNNING.  The runningProcess is pid 1.  The ready queue
+    // Pid 1 changes to be RUNNING.  The getRunningProcessId is pid 1.  The ready queue
     // now only has 1 process on it.  You should work on all of these one by one.
     // First of all, before we dispatch, lets check that isCpuIdle() and
-    // runningProcess() are both working. The cpu should currently be idle
+    // getRunningProcessId() are both working. The cpu should currently be idle
     CHECK(sim.isCpuIdle());
-    CHECK(sim.runningProcess() == IDLE);
+    CHECK(sim.getRunningProcessId() == IDLE);
   }
-#endif
 
-#undef task3_2
-#ifdef task3_2
   // now try to dispatch()
   sim.dispatch();
 
@@ -299,7 +296,7 @@ TEST_CASE("Task 3: task 3 test case section", "[task3]")
   {
     // first, was the cpu updated correctly
     CHECK_FALSE(sim.isCpuIdle());
-    CHECK(sim.runningProcess() == 1);
+    CHECK(sim.getRunningProcessId() == 1);
 
     // next does the ready queue look correct
     CHECK(sim.readyQueueSize() == 1);
@@ -312,7 +309,7 @@ TEST_CASE("Task 3: task 3 test case section", "[task3]")
   SECTION("Task 3: <dispatch()> correctly sets dispatched process to running", "[task3]")
   {
     // check that the process that is running was correctly put into the running state
-    Pid pid = sim.runningProcess();
+    Pid pid = sim.getRunningProcessId();
     Process p = sim.getProcess(pid);
     CHECK(p.isInState(1, RUNNING, 1, 0, 0, NA_EVENT));
   }
@@ -323,7 +320,7 @@ TEST_CASE("Task 3: task 3 test case section", "[task3]")
   SECTION("Task 3: <dispatch()> dispatch does nothing when cpu is running", "[task3]")
   {
     CHECK_FALSE(sim.isCpuIdle());
-    CHECK(sim.runningProcess() == 1);
+    CHECK(sim.getRunningProcessId() == 1);
     CHECK(sim.readyQueueSize() == 1);
     CHECK(sim.readyQueueFront() == 2);
     CHECK(sim.readyQueueBack() == 2);
@@ -339,21 +336,20 @@ TEST_CASE("Task 3: task 3 test case section", "[task3]")
     CHECK(sim2.isInState(8, 1, 0, 0, IDLE, 0, IDLE, IDLE, 0));
     sim2.dispatch();
     CHECK(sim2.isCpuIdle());
-    CHECK(sim2.runningProcess() == IDLE);
+    CHECK(sim2.getRunningProcessId() == IDLE);
     CHECK(sim2.readyQueueSize() == 0);
     CHECK(sim2.readyQueueFront() == IDLE);
     CHECK(sim2.readyQueueBack() == IDLE);
     CHECK(sim2.isInState(8, 1, 0, 0, IDLE, 0, IDLE, IDLE, 0));
   }
-#endif
 }
+#endif
 
 /**
  * @brief Task 4: ProcessSimulator cpu event initial tests.  We just test
  * that time used and quantum used is being incremented.  Later
  * tests will test other aspects of this function.
  */
-#undef task4
 #ifdef task4
 TEST_CASE("Task 4: task 4 test case section", "[task4]")
 {
@@ -410,7 +406,6 @@ TEST_CASE("Task 4: task 4 test case section", "[task4]")
 /**
  * @brief Task 5: test ProcessSimulator <timeout()> member function event
  */
-#undef task5
 #ifdef task5
 TEST_CASE("Task 5: task 5 test case section", "[task5]")
 {
@@ -545,7 +540,7 @@ TEST_CASE("Task 5: task 5 test case section", "[task5]")
       // first check if we can dispatch a process if the cpu is idle
       sim.dispatch();
       CHECK(not sim.isCpuIdle());
-      CHECK(sim.runningProcess() == 1);
+      CHECK(sim.getRunningProcessId() == 1);
 
       // execute a cpu cycle on the running process
       sim.cpuEvent();
@@ -572,7 +567,7 @@ TEST_CASE("Task 5: task 5 test case section", "[task5]")
       // first check if we can dispatch a process if the cpu is idle
       sim.dispatch();
       CHECK(not sim.isCpuIdle());
-      CHECK(sim.runningProcess() == 2);
+      CHECK(sim.getRunningProcessId() == 2);
 
       // execute a cpu cycle on the running process
       sim.cpuEvent();
@@ -604,7 +599,6 @@ TEST_CASE("Task 5: task 5 test case section", "[task5]")
 /**
  * @brief Task 6: test ProcessSimulator <blockEvent()> member function
  */
-#undef task6
 #ifdef task6
 TEST_CASE("Task 6: task 6 test case section", "[task6]")
 {
@@ -726,7 +720,6 @@ TEST_CASE("Task 6: task 6 test case section", "[task6]")
 /**
  * @brief Task 7: test ProcessSimulator <unblockEvent()> member function
  */
-#undef task7
 #ifdef task7
 TEST_CASE("Task 7: task 7 test case section", "[task7]")
 {
@@ -840,7 +833,6 @@ TEST_CASE("Task 7: task 7 test case section", "[task7]")
  * @brief Task 8: ProcessSimulator <doneEvent()> member function tests
  * system.
  */
-#undef task8
 #ifdef task8
 TEST_CASE("Task 8: task 8 test case section", "[task8]")
 {

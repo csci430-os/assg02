@@ -150,43 +150,6 @@ int ProcessSimulator::getNumFinishedProcesses() const
 }
 
 /**
- * @brief get process
- *
- * Accessor method, returns a reference to the Process indicated.  If
- * the pid is not a valid pid or indicates the IDLE process, an
- * empty/idle process is returned.
- *
- * @param pid The process identifier of the process currently being managed
- *   by the system to look up and return.
- *
- * @returns Process Retuns a reference to a Process object, which should be
- *   the process with the pid that was requested.
- */
-
-/**
- * @brief cpu running process
- *
- * Accessor method to return the Pid of the process currently
- * allocated the cpu and thus currently running on the cpu.
- * This method returns the IDLE pid if the cpu is currently
- * not allocated and is thus idle.
- *
- * @returns Pid Returns the process identifier of the process
- *   allocated the cpu.  If the cpu is currently idle, then the
- *   IDLE Pid identifier is returned.
- */
-
-/**
- * @brief is cpu idle
- *
- * Accessor method returns true if the cpu is currently idle or false
- * otherwise.
- *
- * @returns bool true if cpu is currently IDLE and not allocated a process,
- *   false otherwise.
- */
-
-/**
  * @brief ready queue size
  *
  * Accessor method returns current size of the ready queue.
@@ -337,6 +300,30 @@ bool ProcessSimulator::isInState(Time timeSliceQuantum, Time systemTime, int num
  *   - The new process is put into the READY state.
  *   - The new process is added to the back of the ready queue.
  *   - Update the next process id for next new process creation.
+ */
+
+ /**
+ * @brief get process
+ *
+ * Accessor method, returns a reference to the Process indicated.  If
+ * the pid is not a valid pid or indicates the IDLE process, an
+ * empty/idle process is returned.
+ *
+ * @param pid The process identifier of the process currently being managed
+ *   by the system to look up and return.
+ *
+ * @returns Process Retuns a reference to a Process object, which should be
+ *   the process with the pid that was requested.
+ */
+
+/**
+ * @brief is cpu idle
+ *
+ * Accessor method returns true if the cpu is currently idle or false
+ * otherwise.
+ *
+ * @returns bool true if cpu is currently IDLE and not allocated a process,
+ *   false otherwise.
  */
 
 /**

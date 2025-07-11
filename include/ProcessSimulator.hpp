@@ -50,6 +50,12 @@ private:
   /// @brief Keeps track of the number of processes that have exited the system.
   int numFinishedProcesses;
 
+  /// @brief Keep track of what process is currently running.  The cpu member
+  ///   variable will be IDLE (pid 0) when no process is running, or will have
+  ///   the pid of the process that is running if there is currently a process
+  ///   allocated the cpu
+  Pid cpu;
+
   /// @brief Use a map for our process control block.  This makes dynamically
   ///   adding new processes and/or removing done processes simple
   map<Pid, Process> processControlBlock;
@@ -64,11 +70,6 @@ private:
   ///   which particular event id.
   map<EventId, Pid> blockedList;
 
-  /// @brief Keep track of what process is currently running.  The cpu member
-  ///   variable will be IDLE (pid 0) when no process is running, or will have
-  ///   the pid of the process that is running if there is currently a process
-  ///   allocated the cpu
-  Pid cpu;
 
 public:
   // constructors and destructors
@@ -84,8 +85,6 @@ public:
   int getNumFinishedProcesses() const;
   Pid getRunningProcessId() const;
 
-  // accessor methods for Processes managed by the simulator
-
   // cpu, ready queue and blocked list management functions
   int readyQueueSize() const;
   Pid readyQueueFront() const;
@@ -94,7 +93,7 @@ public:
   bool isInState(Time timeSliceQuantum, Time systemTime, int numActiveProcesses, int numFinishedProcesses, Pid runningProcess,
     int readyQueueSize, Pid readyQueueFront, Pid readyQueueBack, int blockedListSize);
 
-  // system event simulations and simulation management
+  // declare task functions, system event simulation functions and utility functions for assignment here
 
   // full simulation functions
   void runSimulation(string simulationFile);
